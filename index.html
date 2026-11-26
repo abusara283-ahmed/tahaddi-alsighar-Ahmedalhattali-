@@ -1169,7 +1169,8 @@ if(!S.dl)S.dl={};
 const QR=()=>S.qrec==='m'?'m':'h';
 const netUrl=(rec,k)=>(SAME?'juz/':JUZ_REMOTE)+rec+'/'+(k==='bis'?'001001':k)+'.mp3';
 const apkDL=rec=>IS_APK&&window.AndroidDL&&+AndroidDL.count(rec)>=JUZ_N;
-function juzUrl(rec,k){if(IS_APK){if(rec==='h')return 'file:///android_asset/juz/h/'+(k==='bis'?'001001':k)+'.mp3';if(apkDL(rec))return 'file://'+AndroidDL.dir()+rec+'/'+(k==='bis'?'001001':k)+'.mp3'}return netUrl(rec,k)}
+const apkHas=()=>{try{return IS_APK&&window.AndroidDL&&AndroidDL.bundled&&!!AndroidDL.bundled()}catch(e){return false}};
+function juzUrl(rec,k){if(IS_APK){if(rec==='h'&&apkHas())return 'file:///android_asset/juz/h/'+(k==='bis'?'001001':k)+'.mp3';if(apkDL(rec))return 'file://'+AndroidDL.dir()+rec+'/'+(k==='bis'?'001001':k)+'.mp3'}return netUrl(rec,k)}
 const canCache=()=>!IS_APK&&('caches' in window)&&window.isSecureContext;
 function getArr(url){const c=canCache()?caches.match(url).then(r=>r?r.arrayBuffer():null).catch(()=>null):Promise.resolve(null);
  return c.then(b=>b||new Promise((res,rej)=>{try{const x=new XMLHttpRequest();x.open('GET',url);x.responseType='arraybuffer';x.onload=()=>((x.status===200||x.status===0)&&x.response&&x.response.byteLength>500)?res(x.response):rej(x.status);x.onerror=()=>rej(0);x.send()}catch(e){rej(e)}}))}
@@ -1181,7 +1182,7 @@ function qBuf(k,rec){rec=rec||'h';const id=embedded(rec,k)?'e:'+k:rec+':'+k;if(Q
  QB[id].catch(()=>delete QB[id]);
  if(id[0]!=='e'){QBo.push(id);while(QBo.length>14){const o=QBo.shift();if(o!==id)delete QB[o]}}
  return QB[id]}
-const surOffline=(rec,s)=>{const x=SUR.find(y=>y.s===s);return (rec==='h'&&(IS_APK||x.a.every((a,i)=>QA[aKey(s,i+1)])))||!!S.dl[rec]||apkDL(rec)}
+const surOffline=(rec,s)=>{const x=SUR.find(y=>y.s===s);return (rec==='h'&&(apkHas()||x.a.every((a,i)=>QA[aKey(s,i+1)])))||!!S.dl[rec]||apkDL(rec)}
 function qStop(){qGen++;if(qSrc){try{qSrc.stop()}catch(e){}qSrc=null}$$('.ayah.now').forEach(x=>x.classList.remove('now'))}
 function qPlay(keys,onEach,done,rec){qStop();hush();bgHold();const my=qGen;let i=0,bad=0;rec=rec||'h';
  const next=()=>{if(my!==qGen)return;if(i>=keys.length){qSrc=null;done&&done();return}const k=keys[i];onEach&&onEach(k,i);
